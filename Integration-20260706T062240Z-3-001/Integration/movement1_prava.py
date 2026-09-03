@@ -557,20 +557,33 @@ if __name__ == "__main__":
 from collections import Counter
 
 def classify_movement1(trajectory_log):
-
     if trajectory_log is None or len(trajectory_log) == 0:
         return None
 
-    keys = trajectory_log[0].keys()
-    final_symbols = []
+    dir_vals = [x.get("Direction") for x in trajectory_log if x.get("Direction")]
+    path_vals = [x.get("Path") for x in trajectory_log if x.get("Path")]
+    repeat_vals = [x.get("Repeat") for x in trajectory_log if x.get("Repeat")]
 
-    for key in keys:
-        vals = [x[key] for x in trajectory_log if x[key] is not None]
+    primary_dir = Counter(dir_vals).most_common(1)[0][0] if dir_vals else None
+    primary_path = Counter(path_vals).most_common(1)[0][0] if path_vals else None
 
-        if vals:
-            final_symbols.append(Counter(vals).most_common(1)[0][0])
+    # Prefer complex curve/path (circle, wavy, zigzag) > directional linear move
+    chosen = None
+    if primary_path and primary_path in ["hamcircleo", "hamwavy", "hamzigzag", "hamtwisting"]:
+        chosen = primary_path
+    elif primary_dir and primary_dir != "hamnomotion":
+        chosen = primary_dir
 
-    return " ".join(final_symbols)
+    if not chosen:
+        return None
+
+    if repeat_vals:
+        rep = Counter(repeat_vals).most_common(1)[0][0]
+        if rep and rep in ["hamrepeatcontinue", "hamrepeatfromstart"]:
+            return f"{chosen} {rep}"
+
+    return chosen
+
 
 
 # In[ ]:

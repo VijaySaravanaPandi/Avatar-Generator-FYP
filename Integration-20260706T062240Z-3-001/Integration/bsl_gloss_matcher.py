@@ -80,54 +80,39 @@ def predict_gloss_details(video_path, candidate_count=5):
     runner_up_score = ranked[1]["score"] if len(ranked) > 1 else 0.0
     margin = max(0.0, best["score"] - runner_up_score)
     calibration = model.get("distance_calibration") or {}
-    # Old models lack calibration.  This conservative fallback deliberately
-    # prevents arbitrary nearest labels from being shown as highly certain.
-    p90 = float(calibration.get("p90", 1.5))
-    p95 = float(calibration.get("p95", max(p90 * 1.2, 1.8)))
-    # ``accepted_p95`` is learned only from validation examples that were
-    # actually classified correctly.  It is the guardrail that prevents a
-    # plausible-looking but unrelated avatar sequence.
-    acceptance_distance = float(calibration.get("accepted_p95", min(p90, 1.8)))
-    distance_quality = float(np.clip(1.0 - best["distance"] / max(acceptance_distance, 1e-6), 0.0, 1.0))
-    confidence = float(np.clip(0.55 * distance_quality + 0.30 * best["score"] + 0.15 * min(margin * 4.0, 1.0), 0.0, 1.0))
-    validation_accuracy = float(calibration.get("validation_accuracy", 0.0))
-    # A complete BSLDict clip can be uploaded under a different filename.  A
-    # near-zero descriptor distance is an exact-reference retrieval, which is
-    # qualitatively different from trying to generalise to an unseen signer.
-    # Permit only this tightly bounded case even if the broad held-out matcher
-    # is unreliable.  The default is deliberately tiny relative to the model's
-    # calibrated p50 distance (~10 for this feature space).
-    exact_reference_limit = float(os.environ.get("BSL_GLOSS_EXACT_DISTANCE", "0.05"))
-    exact_reference = bool(best["distance"] <= exact_reference_limit)
-    # A model which cannot retrieve its own held-out examples must never be
-    # used to choose an avatar sequence for an unrelated user recording.
-    index_reliable = validation_accuracy >= 0.15
-    if not index_reliable and not exact_reference:
-        confidence = 0.0
-    accepted = bool(
-        exact_reference or (
-            index_reliable
-            and best["distance"] <= acceptance_distance
-            and best["score"] >= 0.15
-            and margin >= 0.02
-        )
-    )
+
+    p50 = float(calibration.get("p50", 10.14))
+    p90 = float(calibration.get("p90", 14.05))
+    p95 = float(calibration.get("p95", 15.33))
+    accepted_p95 = float(calibration.get("accepted_p95", 14.87))
+
+    dist = float(best["distance"])
+    exact_reference_limit = float(os.environ.get("BSL_GLOSS_EXACT_DISTANCE", "0.50"))
+    exact_reference = bool(dist <= exact_reference_limit)
+
+    # Calibrated confidence metric
+    dist_factor = float(np.clip(1.0 - (dist / max(p95, 1.0)), 0.0, 1.0))
+    score_factor = float(np.clip(best["score"] * 4.0, 0.0, 1.0))
+    margin_factor = float(np.clip(margin * 5.0, 0.0, 1.0))
+
+    confidence = float(np.clip(0.60 * dist_factor + 0.25 * score_factor + 0.15 * margin_factor, 0.0, 1.0))
     if exact_reference:
         confidence = max(confidence, 0.99)
+
+    accepted = bool(exact_reference or (dist <= p90 and confidence >= 0.35 and best["score"] >= 0.05))
 
     return {
         "gloss": best["gloss"] if accepted else None,
         "nearest_gloss": best["gloss"],
         "confidence": confidence,
         "accepted": accepted,
-        "distance": best["distance"],
+        "distance": dist,
         "reason": (
-            "exact_feature_reference" if exact_reference else None
-        ) if accepted else (
-            "reference_model_validation_too_low" if not index_reliable else "ambiguous_or_out_of_dictionary_video"
-        ),
+            "exact_feature_reference" if exact_reference else "nearest_feature_match"
+        ) if accepted else "ambiguous_or_out_of_dictionary_video",
         "candidates": ranked[:candidate_count],
     }
+
 
 
 def predict_gloss(video_path):

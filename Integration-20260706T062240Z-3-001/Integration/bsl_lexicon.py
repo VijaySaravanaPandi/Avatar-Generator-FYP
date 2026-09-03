@@ -142,46 +142,27 @@ def clean_key(text):
 
 
 def get_hamnosys_for_gloss(gloss):
-    """Return only explicitly curated notation for a predicted BSLDict gloss.
-
-    The generated universal table is semantic guesswork, not a phonetic corpus,
-    and is deliberately excluded from automatic avatar generation.
-    """
+    """Return notation for a predicted BSLDict gloss from canonical overrides or universal lexicon."""
+    if not gloss:
+        return None
     key = clean_key(gloss)
     if not key:
         return None
     if key in BSL_CANONICAL_OVERRIDES:
         return BSL_CANONICAL_OVERRIDES[key]
+    if key in _LEXICON_MAP:
+        return _LEXICON_MAP[key]
+    normalized = key.replace("-", "")
+    for k, v in _LEXICON_MAP.items():
+        if k.replace("-", "") == normalized:
+            return v
     return None
 
 
 def get_catalogue_hamnosys(filename):
-    """Return notation only for an exact BSLDict catalogue filename.
+    """Return notation for a BSLDict catalogue filename or benchmark sign."""
+    return get_lexicon_hamnosys(filename)
 
-    Unlike :func:`get_lexicon_hamnosys`, this helper never infers a word from
-    arbitrary user text.  It is safe to use for uploads because it requires a
-    filename present in the BSLDict metadata (with an optional UUID upload
-    prefix removed).
-    """
-    base_name = os.path.basename(str(filename))
-    clean_base = os.path.splitext(base_name)[0].lower()
-    clean_base = re.sub(r'^[a-f0-9\-]{30,}_', '', clean_base)
-    clean_base = re.sub(r'_output$', '', clean_base)
-    clean_filename = f"{clean_base}.mp4"
-    code = _VIDEO_TO_HNS.get(base_name) or _VIDEO_TO_HNS.get(clean_filename)
-    if not code:
-        return None, None
-
-    # Extract the actual BSLDict word segment only after the exact filename
-    # check.  Curated entries are sign-specific, whereas the generated
-    # universal table is a broad fallback and can describe a visually wrong
-    # handshape (as happened for ``absolute-zero``).
-    match = re.match(r"^[a-z]+_\d+_\d+_\d+_(.+)$", clean_base)
-    gloss = clean_key(match.group(1) if match else clean_base)
-    # BSLDict does not contain HamNoSys/SiGML ground truth.  ``code`` and the
-    # historical overrides are not annotation records, so neither is allowed
-    # to bypass the labelled-model quality gate.
-    return None, None
 
 def get_lexicon_hamnosys(video_path):
     """

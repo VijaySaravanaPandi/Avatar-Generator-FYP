@@ -200,7 +200,17 @@ def run_handshape_module(video_path):
 
                 for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
                     h_type = handedness.classification[0].label # 'Right' or 'Left'
-                    shape = classify_handshape(hand_landmarks.landmark)
+                    # Extract normalized 63-D features for Deep Neural inference
+                    pts = np.array([[p.x, p.y, p.z] for p in hand_landmarks.landmark], dtype=np.float32)
+                    pts = pts - pts[0]
+                    max_d = np.max(np.linalg.norm(pts, axis=1))
+                    if max_d > 1e-6:
+                        pts = pts / max_d
+                    feats = pts.flatten()
+
+                    nn_shape = neural_predict_handshape(feats)
+                    geom_shape = classify_handshape(hand_landmarks.landmark)
+                    shape = nn_shape if (nn_shape and nn_shape != "hamflathand") else geom_shape
                     if h_type == "Right":
                         r_label = shape
                     else:
