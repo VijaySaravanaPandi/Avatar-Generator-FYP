@@ -46,7 +46,7 @@ def _hand_descriptor(samples, wrists):
 
 
 def extract_video_feature(video_path: str | Path, samples_per_video: int = SAMPLES_PER_VIDEO):
-    """Extract a 536-D, camera-scale-invariant descriptor from a sign video.
+    """Extract a 536-D, camera-scale-invariant descriptor from the active signing segment of a video.
 
     The output order is right hand then left hand, followed by each hand's frame
     presence ratio. ``None`` means no hands were detected.
@@ -56,7 +56,16 @@ def extract_video_feature(video_path: str | Path, samples_per_video: int = SAMPL
         return None
 
     frame_count = max(int(cap.get(cv2.CAP_PROP_FRAME_COUNT)), 1)
-    selected = set(np.linspace(0, frame_count - 1, min(frame_count, samples_per_video), dtype=int))
+    
+    # Temporal action segmentation: trim initial/ending rest frames if video has > 15 frames
+    if frame_count > 15:
+        start_frame = int(frame_count * 0.08)
+        end_frame = int(frame_count * 0.92)
+    else:
+        start_frame = 0
+        end_frame = frame_count - 1
+
+    selected = set(np.linspace(start_frame, end_frame, min(frame_count, samples_per_video), dtype=int))
     samples = {"Right": [], "Left": []}
     wrists = {"Right": [], "Left": []}
     processed = 0
@@ -64,8 +73,8 @@ def extract_video_feature(video_path: str | Path, samples_per_video: int = SAMPL
     with mp.solutions.hands.Hands(
         static_image_mode=False,
         max_num_hands=2,
-        min_detection_confidence=0.5,
-        min_tracking_confidence=0.5,
+        min_detection_confidence=0.4,
+        min_tracking_confidence=0.4,
     ) as hands:
         frame_index = 0
         while True:
@@ -94,3 +103,4 @@ def extract_video_feature(video_path: str | Path, samples_per_video: int = SAMPL
     return np.concatenate(
         [_hand_descriptor(samples["Right"], wrists["Right"]), _hand_descriptor(samples["Left"], wrists["Left"]), presence]
     )
+

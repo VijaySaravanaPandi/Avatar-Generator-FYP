@@ -164,6 +164,8 @@ def classify_handshape(lm):
 def run_handshape_module(video_path):
     """
     Extracts handshapes for BOTH Right and Left hands across the video.
+    Uses MediaPipe Pose wrist anchoring to prevent left/right hand identity swaps
+    during hand crossing/touching, and interpolates short detection dropouts.
     Returns dominant Right Hand, Left Hand, and two-handed detection metrics.
     """
     cap = cv2.VideoCapture(video_path)
@@ -171,17 +173,30 @@ def run_handshape_module(video_path):
         return None
 
     mp_hands = mp.solutions.hands
+    mp_pose = mp.solutions.pose
     per_frame_right = []
     per_frame_left = []
     two_hands_count = 0
     total_frames = 0
 
+    # Track consecutive "none" gaps for interpolation
+    last_valid_r = "none"
+    last_valid_l = "none"
+    r_gap = 0
+    l_gap = 0
+    MAX_INTERP_GAP = 4  # Interpolate up to 4 consecutive dropped frames
+
     with mp_hands.Hands(
         static_image_mode=False,
         max_num_hands=2,
+        min_detection_confidence=0.35,
+        min_tracking_confidence=0.35
+    ) as hands, mp_pose.Pose(
+        static_image_mode=False,
+        model_complexity=0,
         min_detection_confidence=0.4,
         min_tracking_confidence=0.4
-    ) as hands:
+    ) as pose:
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -190,6 +205,18 @@ def run_handshape_module(video_path):
 
             img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = hands.process(img)
+            pose_results = pose.process(img)
+
+            # Extract Pose wrist positions for anchoring hand identity
+            pose_right_wrist = None
+            pose_left_wrist = None
+            if pose_results.pose_landmarks:
+                plm = pose_results.pose_landmarks.landmark
+                # MediaPipe Pose: landmark 16 = right wrist, 15 = left wrist
+                if plm[16].visibility > 0.3:
+                    pose_right_wrist = np.array([plm[16].x, plm[16].y])
+                if plm[15].visibility > 0.3:
+                    pose_left_wrist = np.array([plm[15].x, plm[15].y])
 
             r_label = "none"
             l_label = "none"
@@ -199,7 +226,21 @@ def run_handshape_module(video_path):
                     two_hands_count += 1
 
                 for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
-                    h_type = handedness.classification[0].label # 'Right' or 'Left'
+                    mp_label = handedness.classification[0].label  # 'Right' or 'Left'
+
+                    # Pose-guided identity correction: if Pose wrists are available,
+                    # assign each detected hand to the nearest Pose wrist
+                    hand_wrist = np.array([hand_landmarks.landmark[0].x, hand_landmarks.landmark[0].y])
+                    if pose_right_wrist is not None and pose_left_wrist is not None and len(results.multi_hand_landmarks) == 1:
+                        dist_to_right = np.linalg.norm(hand_wrist - pose_right_wrist)
+                        dist_to_left = np.linalg.norm(hand_wrist - pose_left_wrist)
+                        if dist_to_right < dist_to_left:
+                            h_type = "Right"
+                        else:
+                            h_type = "Left"
+                    else:
+                        h_type = mp_label
+
                     # Extract normalized 63-D features for Deep Neural inference
                     pts = np.array([[p.x, p.y, p.z] for p in hand_landmarks.landmark], dtype=np.float32)
                     pts = pts - pts[0]
@@ -216,8 +257,26 @@ def run_handshape_module(video_path):
                     else:
                         l_label = shape
 
+            # Short-gap interpolation: if a hand was recently detected and dropped
+            # for a few frames (occlusion during touching), carry forward the last label
+            if r_label != "none":
+                last_valid_r = r_label
+                r_gap = 0
+            elif last_valid_r != "none" and r_gap < MAX_INTERP_GAP:
+                r_label = last_valid_r
+                r_gap += 1
+
+            if l_label != "none":
+                last_valid_l = l_label
+                l_gap = 0
+            elif last_valid_l != "none" and l_gap < MAX_INTERP_GAP:
+                l_label = last_valid_l
+                l_gap += 1
+
             per_frame_right.append(r_label)
             per_frame_left.append(l_label)
+
+    cap.release()
 
     from collections import Counter
     valid_r = [x for x in per_frame_right if x != "none"]
@@ -241,3 +300,4 @@ def run_handshape_module(video_path):
         "is_two_handed": is_two_handed,
         "two_hands_ratio": two_hands_count / max(1, total_frames)
     }
+

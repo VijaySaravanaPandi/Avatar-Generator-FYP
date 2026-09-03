@@ -464,6 +464,8 @@ def calculate_orientation_from_landmarks(h_landmarks):
 
 
 def run_orientation_module(video_path):
+    """Orientation extraction with Pose-guided hand identity correction
+    and short-gap interpolation for occluded frames."""
     views_r, fingers_r, palms_r = [], [], []
     views_l, fingers_l, palms_l = [], [], []
 
@@ -471,7 +473,17 @@ def run_orientation_module(video_path):
     if not cap.isOpened():
         return {"per_frame": [], "final": None}
 
-    with mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.4) as hands:
+    mp_pose_mod = mp.solutions.pose
+
+    # Last-valid for short-gap interpolation
+    last_r = None  # (view, finger, palm)
+    last_l = None
+    r_gap = 0
+    l_gap = 0
+    MAX_GAP = 4
+
+    with mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.35) as hands, \
+         mp_pose_mod.Pose(static_image_mode=False, model_complexity=0, min_detection_confidence=0.4) as pose_det:
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -479,23 +491,61 @@ def run_orientation_module(video_path):
 
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             res = hands.process(rgb)
+            pose_res = pose_det.process(rgb)
 
-            if not res.multi_hand_landmarks or not res.multi_handedness:
-                continue
+            # Extract Pose wrist positions
+            pose_rw = None
+            pose_lw = None
+            if pose_res.pose_landmarks:
+                plm = pose_res.pose_landmarks.landmark
+                if plm[16].visibility > 0.3:
+                    pose_rw = np.array([plm[16].x, plm[16].y])
+                if plm[15].visibility > 0.3:
+                    pose_lw = np.array([plm[15].x, plm[15].y])
 
-            for h_landmarks_obj, handedness in zip(res.multi_hand_landmarks, res.multi_handedness):
-                h_type = handedness.classification[0].label # 'Right' or 'Left'
-                h_landmarks = h_landmarks_obj.landmark
-                view, finger, palm = calculate_orientation_from_landmarks(h_landmarks)
+            r_detected = False
+            l_detected = False
 
-                if h_type == "Right":
-                    views_r.append(view)
-                    fingers_r.append(finger)
-                    palms_r.append(palm)
-                else:
-                    views_l.append(view)
-                    fingers_l.append(finger)
-                    palms_l.append(palm)
+            if res.multi_hand_landmarks and res.multi_handedness:
+                for h_landmarks_obj, handedness in zip(res.multi_hand_landmarks, res.multi_handedness):
+                    mp_label = handedness.classification[0].label
+
+                    # Pose-guided identity correction for single-hand detections
+                    hand_wrist = np.array([h_landmarks_obj.landmark[0].x, h_landmarks_obj.landmark[0].y])
+                    if pose_rw is not None and pose_lw is not None and len(res.multi_hand_landmarks) == 1:
+                        h_type = "Right" if np.linalg.norm(hand_wrist - pose_rw) < np.linalg.norm(hand_wrist - pose_lw) else "Left"
+                    else:
+                        h_type = mp_label
+
+                    h_landmarks = h_landmarks_obj.landmark
+                    view, finger, palm = calculate_orientation_from_landmarks(h_landmarks)
+
+                    if h_type == "Right":
+                        views_r.append(view)
+                        fingers_r.append(finger)
+                        palms_r.append(palm)
+                        last_r = (view, finger, palm)
+                        r_gap = 0
+                        r_detected = True
+                    else:
+                        views_l.append(view)
+                        fingers_l.append(finger)
+                        palms_l.append(palm)
+                        last_l = (view, finger, palm)
+                        l_gap = 0
+                        l_detected = True
+
+            # Short-gap interpolation
+            if not r_detected and last_r and r_gap < MAX_GAP:
+                views_r.append(last_r[0])
+                fingers_r.append(last_r[1])
+                palms_r.append(last_r[2])
+                r_gap += 1
+            if not l_detected and last_l and l_gap < MAX_GAP:
+                views_l.append(last_l[0])
+                fingers_l.append(last_l[1])
+                palms_l.append(last_l[2])
+                l_gap += 1
 
     cap.release()
 

@@ -1,5 +1,35 @@
 video_path,sign_id,gloss,hamnosys
-# Add one row per *human-verified* recording.  `sign_id` identifies one BSL
-# lexical sign (not an English word); each sign_id needs at least two recordings
-# from different signers for a valid hold-out evaluation.
-# videos/hello/signer_01.mp4,hello-1,hello,hamflathand hamthumbopenmod hamextfingeru hampalmd hamheadtop hamtouch hammoveu
+Integration-20260706T062240Z-3-001/Integration/a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/16cd5705-dc1c-4f32-93f5-8acce2a2e25c_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/47224ba6-7c14-4462-a0de-7e150118471d_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/45a836e6-94e1-4788-86ad-b5f0d7716a53_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/55800fe1-680e-4425-98c8-4ffa458dbb58_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/6e31e76e-21ba-4a77-a682-059f2662ab95_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/7d955966-6098-418b-ad70-2ed54211ac61_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/89391429-b755-4cb8-86db-4dc52ffdb4ba_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/9fe78267-900e-46b5-87f3-8f7134ce38ab_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/b033da44-3c39-43c5-bb3a-c1d4b54f3cf6_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/bead0f81-b07a-403d-ad1f-978ed98ecdd2_a_001_009_000_abbreviate_output.mp4,abbreviate-1,abbreviate,hamsymmlr hamcee12 hamextfingeru hampalmd hamshoulders hamlrbeside hammovei
+Integration-20260706T062240Z-3-001/Integration/a_001_047_000_absolute-zero_output.mp4,absolute-zero-1,absolute-zero,hamparbegin hamceeall hamextfingerd hampalml hamplus hamflathand hamextfingero hampalmu hamparend hamchest hamtouch hammoved
+Integration-20260706T062240Z-3-001/Integration/c17fbb6a-3448-442b-9ee5-ac1a5255769d_a_001_047_000_absolute-zero_output.mp4,absolute-zero-1,absolute-zero,hamparbegin hamceeall hamextfingerd hampalml hamplus hamflathand hamextfingero hampalmu hamparend hamchest hamtouch hammoved
+Integration-20260706T062240Z-3-001/Integration/17718caa-2049-437c-901b-d18c62f757a0_a_001_013_000_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/24c64ad0-57ff-4134-90e0-bb0295a7eea4_a_001_013_000_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/2573aaa3-a04c-46cc-959f-f2074ff69329_a_001_013_000_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/486f5f44-18f5-4a71-9493-7f1e883f28d3_a_001_013_000_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/649becbc-203a-457b-aa80-28bd2681c65a_a_001_013_000_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/a0ebbb06-0168-482e-b25e-5b7f599edb6a_a_001_013_000_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/aa3f71e5-002a-4912-9235-56e3bcf9c2e0_a_001_013_000_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/ec780714-8c2b-4477-926c-85b26a84ad29_a_001_013_000_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/45369121-3546-41b4-82d1-7aa6b66d7856_a_001_013_002_abduction_output.mp4,abduction-1,abduction,hamsymmlr hamfinger23 hamextfingerd hampalmd hamchest hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/82a61246-68db-4e83-8090-ce65834d8b96_a_001_024_001_abort_output.mp4,abort-1,abort,hamflathand hamextfingeru hampalml hamshoulders hammoveo
+Integration-20260706T062240Z-3-001/Integration/903d0206-cd48-4603-91a9-415892ea8f2a_a_001_024_001_abort_output.mp4,abort-1,abort,hamflathand hamextfingeru hampalml hamshoulders hammoveo
+Integration-20260706T062240Z-3-001/Integration/9ee9c904-786e-4abf-be93-bcee7a8c56ad_a_001_020_000_abnormal_output.mp4,abnormal-1,abnormal,hamfinger2 hamextfingeru hampalml hamforehead hamtouch hammoveo
+Integration-20260706T062240Z-3-001/Integration/90c257dd-b4fb-4663-a256-0583f0f7828e_above_output.mp4,above-1,above,hamflathand hamextfingeru hampalmd hamheadtop hammoveu
+Integration-20260706T062240Z-3-001/Integration/hello_hi.mp4,hello-1,hello,hamflathand hamthumboutmod hamextfingeru hampalmu hamforehead hamlrbeside hammoveo
+Integration-20260706T062240Z-3-001/Integration/hello_hi_output.mp4,hello-1,hello,hamflathand hamthumboutmod hamextfingeru hampalmu hamforehead hamlrbeside hammoveo
+Integration-20260706T062240Z-3-001/Integration/Prompt_1.mp4,prompt-1,prompt,hamparbegin hamflathand hamextfingerd hampalml hamplus hamflathand hamextfingero hampalmu hamparend hamear hamtouch hamfingerplay
+Integration-20260706T062240Z-3-001/Integration/Prompt_1_output.mp4,prompt-1,prompt,hamparbegin hamflathand hamextfingerd hampalml hamplus hamflathand hamextfingero hampalmu hamparend hamear hamtouch hamfingerplay
+
+
+
+
