@@ -144,17 +144,20 @@ def combine_hamnosys(handshape, orientation, upper_body, head_face, hand_locatio
         r_handshape = pick_token(handshape, "final_right") or pick_token(handshape, "final") or "hamflathand"
         l_handshape = pick_token(handshape, "final_left")
 
-        # Fallback two-handed detection: if left hand was detected even in few frames
-        # and arm_space shows neutral/doublebent posture, treat as two-handed
-        if not is_two_handed and ratio >= 0.10 and l_handshape and l_handshape != "none" and l_handshape != "hamflathand":
+        # Two-handed detection: if left hand was detected in the video or dual arms active
+        if not is_two_handed and l_handshape and l_handshape != "none":
             is_two_handed = True
 
-        # Additional fallback: if arm_space has hamdoublebent predominance (wide arms)
+        # Additional fallback: if arm_space has hamdoublebent or wide arm posture
         if not is_two_handed and isinstance(arm_space, dict):
             arm_labels = arm_space.get("per_frame", [])
-            doublebent_count = sum(1 for x in arm_labels if x == "hamdoublebent")
-            if doublebent_count / max(1, len(arm_labels)) >= 0.40:
+            doublebent_count = sum(1 for x in arm_labels if x in ["hamdoublebent", "hamneutralspace"])
+            if doublebent_count / max(1, len(arm_labels)) >= 0.25:
                 is_two_handed = True
+
+        # Check dual orientation
+        if not is_two_handed and isinstance(orientation, dict) and orientation.get("final_left"):
+            is_two_handed = True
 
     # Clean Handshapes
     def clean_hs(token):

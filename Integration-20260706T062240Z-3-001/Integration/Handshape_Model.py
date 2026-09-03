@@ -219,14 +219,14 @@ def run_handshape_module(video_path):
             per_frame_right.append(r_label)
             per_frame_left.append(l_label)
 
-    cap.release()
-
-    # Determine if sign is significantly two-handed (>25% frames have both hands active)
-    is_two_handed = (two_hands_count / max(1, total_frames)) >= 0.20
-
     from collections import Counter
     valid_r = [x for x in per_frame_right if x != "none"]
     valid_l = [x for x in per_frame_left if x != "none"]
+
+    # Sensitive two-handed sign detection (BSL features frequent interacting/touching dual hands)
+    left_hand_active = len(valid_l) >= 4 or (len(valid_l) / max(1, total_frames)) >= 0.08
+    simultaneous_hands = two_hands_count >= 3 or (two_hands_count / max(1, total_frames)) >= 0.08
+    is_two_handed = bool(left_hand_active or simultaneous_hands)
 
     final_r = Counter(valid_r).most_common(1)[0][0] if valid_r else "hamflathand"
     final_l = Counter(valid_l).most_common(1)[0][0] if valid_l else "none"
