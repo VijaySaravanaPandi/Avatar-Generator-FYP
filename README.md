@@ -31,7 +31,7 @@
 
 Before cloning, make sure you have:
 
-- **Python 3.10+**
+- **Python 3.10 – 3.12** (Python 3.12 recommended for MediaPipe compatibility)
 - **Git** ([Download](https://git-scm.com/downloads))
 - **Git LFS** ([Download](https://git-lfs.com/)) — **required** for model files
 
@@ -104,16 +104,12 @@ pip install -r requirements.txt
 
 | Package | Purpose |
 |---------|---------|
-| `mediapipe` (≥0.10.20) | Hand/body landmark detection |
+| `mediapipe` (≤0.10.14) | Hand/body landmark detection |
 | `opencv-python` | Video processing |
 | `numpy` | Numerical operations |
 | `scikit-learn` | ML classifiers (SVM, etc.) |
 | `joblib` | Model serialization |
-
-For the **web app**, additionally install:
-```bash
-pip install flask
-```
+| `flask` | Web dashboard server |
 
 ---
 
@@ -125,25 +121,63 @@ pip install flask
 cd Integration-20260706T062240Z-3-001/Integration
 
 # Default video (Prompt_1.mp4)
-python run_local.py
+py -3.12 run_local.py
+# or: python run_local.py
 
 # Custom video
-python run_local.py path/to/your_video.mp4
+py -3.12 run_local.py path/to/your_video.mp4
 
 # Custom output path
-python run_local.py input.mp4 -o output.mp4
+py -3.12 run_local.py input.mp4 -o output.mp4
 ```
 
-### Web App — Flask UI
+### Web App — Flask UI & 3D Avatar Player
 
 ```bash
 cd webapp
-python app.py
+py -3.12 app.py
 ```
-Then open http://localhost:5000 in your browser, upload a video, and get:
-- HamNoSys tags
-- HamNoSys Unicode
-- SiGML output for avatar rendering
+*(On macOS / Linux: `python3 app.py`)*
+
+Then open **http://localhost:5000** in your browser to access:
+- **Video Upload & Analysis**: Upload sign language video recordings (.mp4, .avi, .mov)
+- **Generated HamNoSys Phonetic Sequence**: Token tags and native HamNoSys font glyph rendering
+- **HamKeyboard Symbol Breakdown**: Interactive categorized visual pills for handshapes, orientations, and locations
+- **SiGML XML Inspector**: Inspect and copy raw Signing Gesture Markup Language XML code
+- **3D Signing Avatar Player**: Live SiGML synthesis with JASigning WebGL Avatar, frame controls, and speed adjustments
+
+### Avatar playback
+
+After processing, the generated SiGML is sent directly to the JASigning WebGL avatar. The player waits briefly for the WebGL engine to become ready, so the avatar performs the generated signing movement instead of remaining in its neutral upright stance.
+
+If the avatar does not start immediately:
+
+1. Wait a few seconds after opening the page for the 3D engine to load.
+2. Use **Replay From Start** or **Play Both (Sync)**.
+3. Refresh the browser with `Ctrl+F5` after updating the project.
+4. Confirm that the browser can access the JASigning WebGL resources; an internet connection is required for those external assets.
+
+The motion shown by the avatar is determined by the HamNoSys/SiGML sequence predicted from the uploaded video. A low-confidence or incomplete prediction can therefore produce a simplified gesture.
+
+### Accuracy and training truthfulness
+
+The bundled BSLDict metadata labels clips with English glosses; it does **not**
+provide HamNoSys or SiGML ground truth.  An English gloss cannot be converted to
+an exact BSL articulation by rules alone.  Consequently, `training/hamnosys_annotations.csv`
+is the required source for the production video-to-avatar model: every row must
+contain a human-verified video, lexical sign ID, and HamNoSys sequence.  Train it
+with:
+
+```bash
+py -3.12 training/train_annotated_sign_matcher.py --manifest training/hamnosys_annotations.csv
+```
+
+The trainer holds out one recording per repeated sign and saves a model only as
+`release_ready` when held-out top-1 sign accuracy is at least 80%.  Include at
+least two recordings per sign from different signers and reserve an additional
+test set before claiming performance.  Until that labelled corpus exists, the
+application will use its visual fallback and must not claim exact avatar
+reproduction for arbitrary BSL uploads.
 
 ---
 
@@ -171,11 +205,14 @@ Avatar-Generator-FYP-/
 │       ├── enc_*.pkl                   # Label encoders (Git LFS)
 │       └── requirements.txt
 │
-├── webapp/                             # 🌐 Flask web application
+├── webapp/                             # 🌐 Flask web application & 3D Avatar UI
 │   ├── app.py                          # Flask server
-│   ├── static/css/styles.css
-│   ├── static/js/app.js
-│   └── templates/index.html
+│   ├── static/
+│   │   ├── css/styles.css              # Custom styled responsive dashboard UI
+│   │   ├── js/app.js                   # Client logic, token parsing & SiGML dispatch
+│   │   ├── HamNoSys.ttf                # Bundled HamNoSys font glyphs
+│   │   └── fonts/                      # Font assets
+│   └── templates/index.html            # Web app dashboard UI
 │
 ├── Senior Code/                        # 📚 Reference: HamNoSys2SiGML converter
 │   └── HamNoSys2SiGML-master/
@@ -211,7 +248,8 @@ Avatar-Generator-FYP-/
 - **ML/Classification**: scikit-learn (SVM classifiers)
 - **Notation System**: HamNoSys → SiGML
 - **Web Framework**: Flask
-- **Frontend**: HTML/CSS/JS, React (Vite) for hex lookup tool
+- **Frontend**: Modern HTML5 / CSS3 / Vanilla JS, JASigning 3D WebGL Avatar
+- **Supporting Tools**: React (Vite) for hex lookup tool
 
 ---
 

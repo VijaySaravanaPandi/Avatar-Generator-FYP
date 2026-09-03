@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HamNoSys Sign Language Translator</title>
+    <title>Sign Language to 3D Avatar Converter</title>
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- JASigning CWASA -->
     <link rel="stylesheet" href="https://vhg.cmp.uea.ac.uk/tech/jas/vhg2026/cwa/cwasa.css" />
@@ -21,105 +23,327 @@
     'avSettings' : { 'avList': 'avsbsl', 'initAv': 'anna' }
 });">
 
-    <!-- Background Decoration -->
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-
-    <div class="container">
-        <header>
-            <h1>HamNoSys <span>Translator</span></h1>
-            <p>Upload a sign language video to convert it into HamNoSys and render it in 3D.</p>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="main-title">Sign Language <span class="gradient-text">to 3D Avatar</span> Converter</h1>
+            <p class="main-subtitle">Upload any sign language video to see it converted into an interactive 3D digital avatar animation in real time.</p>
         </header>
 
-        <main class="grid-container">
-            
-            <!-- Left Column: Upload & Results -->
-            <div class="left-panel">
-                
-                <!-- Upload Section -->
-                <div class="card glass-card" id="upload-card">
-                    <div class="upload-area" id="drop-zone">
-                        <input type="file" id="video-input" accept="video/mp4,video/x-m4v,video/*" hidden>
-                        <div class="upload-content">
-                            <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                            <p class="upload-text">Drag & drop your video here</p>
-                            <span class="upload-subtext">or click to browse</span>
-                        </div>
-                    </div>
-                    
-                    <div id="loading-indicator" class="hidden">
-                        <div class="spinner"></div>
-                        <p>Processing video... this might take a minute.</p>
+        <!-- How This Website Works Card -->
+        <section class="card how-it-works-card">
+            <div class="how-header">
+                <div class="icon-badge-box">
+                    <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <div class="how-text-group">
+                    <h2 class="card-title">How This Website Works</h2>
+                    <p class="card-desc">
+                        This tool converts any video of a person performing sign language into an interactive 3D digital avatar animation. Upload a video clip, and our AI automatically analyzes hand shapes, finger directions, and body movements, then plays the matching sign side-by-side using our 3D avatar.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 3 Steps -->
+            <div class="steps-row">
+                <div class="step-pill">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                        <strong class="step-title">Upload Video</strong>
+                        <span class="step-detail">Choose or drag & drop a sign video clip</span>
                     </div>
                 </div>
-
-                <!-- HamNoSys Results Section -->
-                <div class="card glass-card result-card hidden" id="result-card">
-                    <h3>Translation Results</h3>
-                    
-                    <div class="result-group">
-                        <label>HamNoSys Tags</label>
-                        <div class="result-box" id="hamnosys-tags"></div>
+                <div class="step-pill">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                        <strong class="step-title">AI Analysis</strong>
+                        <span class="step-detail">AI detects hand shapes & movements</span>
                     </div>
-                    
-                    <div class="result-group">
-                        <label>HamNoSys Characters (Font)</label>
-                        <div class="result-box hamnosys-font" id="hamnosys-chars"></div>
+                </div>
+                <div class="step-pill">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                        <strong class="step-title">3D Avatar Replay</strong>
+                        <span class="step-detail">Watch 3D digital avatar perform the sign</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Two-Column Dual Viewports Grid -->
+        <div class="viewports-grid">
+            
+            <!-- Left Card: Input Sign Video Stream -->
+            <div class="card viewport-card">
+                <div class="viewport-header">
+                    <h3 class="viewport-title">1. Input Sign Video Stream</h3>
+                    <span class="badge-pill">CAMERA / FILE FEED</span>
+                </div>
+
+                <div class="viewport-body">
+                    <!-- Drop Zone -->
+                    <div class="upload-dropzone" id="drop-zone">
+                        <input type="file" id="video-input" accept="video/mp4,video/x-m4v,video/quicktime,video/avi,video/*" hidden>
+                        <div class="dropzone-content">
+                            <div class="upload-icon-circle">
+                                <svg class="upload-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <p class="dropzone-title">Upload sign language video file</p>
+                            <span class="dropzone-subtitle">Supports MP4, MOV, AVI or drag & drop</span>
+                        </div>
                     </div>
 
-                    <button id="play-btn" class="btn-primary">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <!-- Video Preview Player (Hidden until loaded) -->
+                    <div class="video-preview-wrapper hidden" id="video-preview-wrapper">
+                        <video id="input-video" playsinline muted preload="auto"></video>
+                        <div class="video-overlay-bar">
+                            <span id="video-filename-tag" class="video-name-tag">Prompt_1.mp4</span>
+                            <button id="btn-change-video" class="btn-change-video" title="Upload different video">Change Video</button>
+                        </div>
+                    </div>
+
+                    <!-- Processing Loading Overlay -->
+                    <div class="loading-overlay hidden" id="loading-overlay">
+                        <div class="loading-spinner"></div>
+                        <p class="loading-title">AI Processing Video...</p>
+                        <span class="loading-desc">Extracting handshapes, locations & movements with MediaPipe</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Card: 3D WebGL Avatar Viewport -->
+            <div class="card viewport-card">
+                <div class="viewport-header">
+                    <h3 class="viewport-title">2. 3D WebGL Avatar Viewport</h3>
+                    <span class="badge-pill">JASIGNING 3D RENDER</span>
+                </div>
+
+                <div class="viewport-body avatar-viewport-body">
+                    <!-- JASigning Avatar injected here -->
+                    <div class="CWASAAvatar av0" id="avatar-canvas-container"></div>
+                    
+                    <!-- Hidden controls required by JASigning CWASA to bind properly -->
+                    <div style="display: none;" aria-hidden="true">
+                        <span class="CWASAAvMenu av0"></span>
+                        <span class="CWASAAmbBox av0"></span>
+                        <input class="txtLogSpeed av0" value="+1.0" type="text" />
+                        <input type="button" value="-" class="bttnSpeedDown av0" />
+                        <input type="button" value="+" class="bttnSpeedUp av0" />
+                        <input type="button" value="Reset" class="bttnSpeedReset av0" />
+                        <input class="txtSiGMLURL av0" value="" type="text" />
+                        <textarea class="txtaSiGMLText av0" rows="10"></textarea>
+                        <input type="button" value="Play SiGML URL" class="bttnPlaySiGMLURL av0" />
+                        <input type="button" value="Play SiGML Text" class="bttnPlaySiGMLText av0" />
+                        <input type="button" value="Stop" class="bttnStop av0" />
+                        <input value="Suspend" class="bttnSuspend av0" type="button">
+                        <input value="Resume" class="bttnResume av0" type="button">
+                        <input value="+1" class="bttnNextF av0" type="button">
+                        <input value="-1" class="bttnPrevF av0" type="button">
+                        <input class="txtSF av0" value="0/0" type="text">
+                        <input class="txtGloss av0" value="[none]" type="text">
+                        <input class="txtFPS av0" value="25.00" type="text" />
+                        <input type="text" class="statusExtra av0" />
+                    </div>
+
+                    <!-- Overlaid Live Telemetry Badges -->
+                    <div class="viewport-overlays">
+                        <div class="telemetry-badge" id="fps-badge">FPS: 25.00</div>
+                        <div class="telemetry-badge" id="frame-badge">Frame: 0/0</div>
+                    </div>
+
+                    <!-- Status Notification Toast / Banner inside avatar viewport -->
+                    <div class="avatar-status-pill hidden" id="avatar-status-pill">
+                        <span class="status-indicator-dot"></span>
+                        <span id="avatar-status-text">Ready</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Synchronized Dual Viewport Controls Bar -->
+        <section class="card controls-card">
+            <div class="controls-top-row">
+                <div class="sync-indicator-group">
+                    <span class="pulse-dot"></span>
+                    <h3 class="sync-heading">Synchronized Dual Viewport Controls</h3>
+                </div>
+
+                <div class="loop-toggle-group">
+                    <span class="loop-label">Continuous Loop (Play Until Stopped)</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="loop-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="controls-bottom-row">
+                <!-- Action Buttons -->
+                <div class="ctrl-action-buttons">
+                    <button id="btn-play-sync" class="btn-ctrl btn-crimson btn-play">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
                         </svg>
-                        Play Animation
+                        Play Both (Sync)
+                    </button>
+                    <button id="btn-stop" class="btn-ctrl btn-crimson btn-stop">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="5" y="5" width="14" height="14" rx="2"></rect>
+                        </svg>
+                        STOP
+                    </button>
+                    <button id="btn-replay" class="btn-ctrl btn-outline btn-replay">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                            <path d="M3 3v5h5"></path>
+                        </svg>
+                        Replay From Start
                     </button>
                 </div>
-            </div>
 
-            <!-- Right Column: Avatar Player -->
-            <div class="right-panel">
-                <div class="card glass-card avatar-card">
-                    <h3>3D Avatar</h3>
-                    <div class="avatar-container">
-                        <!-- JASigning Avatar injected here -->
-                        <div class="CWASAAvatar av0"></div>
-                        
-                        <!-- Hidden controls required by JASigning to initialize properly -->
-                        <div style="display: none;">
-                            <span class="CWASAAvMenu av0"></span>
-                            <span class="CWASAAmbBox av0"></span>
-                            <input class="txtLogSpeed av0" value="+1.0" type="text" />
-                            <input type="button" value="-" class="bttnSpeedDown av0" />
-                            <input type="button" value="+" class="bttnSpeedUp av0" />
-                            <input type="button" value="Reset" class="bttnSpeedReset av0" />
-                            <input class="txtSiGMLURL av0" value="" type="text" />
-                            <textarea class="txtaSiGMLText av0" rows="10"></textarea>
-                            <input type="button" value="Play SiGML URL" class="bttnPlaySiGMLURL av0" />
-                            <input type="button" value="Play SiGML Text" class="bttnPlaySiGMLText av0" />
-                            <input type="button" value="Stop" class="bttnStop av0" />
-                            <input value="Suspend" class="bttnSuspend av0" type="button">
-                            <input value="Resume" class="bttnResume av0" type="button">
-                            <input value="+1" class="bttnNextF av0" type="button">
-                            <input value="-1" class="bttnPrevF av0" type="button">
-                            <input class="txtSF av0" value="0/0" type="text">
-                            <input class="txtGloss av0" value="[none]" type="text">
-                            <input class="txtFPS av0" value="00.00" type="text" />
-                            <input type="text" class="statusExtra av0" />
-                        </div>
+                <!-- Speed Multipliers -->
+                <div class="speed-group">
+                    <span class="ctrl-sublabel">Speed:</span>
+                    <div class="speed-pill-group">
+                        <button class="speed-btn" data-speed="0.5">0.5x</button>
+                        <button class="speed-btn active" data-speed="1.0">1.0x</button>
+                        <button class="speed-btn" data-speed="1.26">1.26x</button>
+                        <button class="speed-btn" data-speed="1.5">1.5x</button>
+                        <button class="speed-btn" data-speed="2.0">2.0x</button>
                     </div>
                 </div>
+
+                <!-- Frame Stepping -->
+                <div class="frame-step-group">
+                    <button id="btn-prev-frame" class="btn-frame-step">-1 Frame</button>
+                    <span id="frame-counter-pill" class="frame-counter-pill">0/0</span>
+                    <button id="btn-next-frame" class="btn-frame-step">+1 Frame</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Generated HamNoSys Phonetic Sequence Card (Hidden until video is processed) -->
+        <section class="card hamnosys-sequence-card hidden" id="results-drawer">
+            <!-- Header Row with Title and Copy Button -->
+            <div class="seq-card-header">
+                <h3 class="seq-main-title">Generated HamNoSys Phonetic Sequence</h3>
+                <button id="btn-copy-tokens" class="btn-copy-tokens" title="Copy Tokens to Clipboard">
+                    <svg class="copy-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span id="copy-btn-text">Copy Tokens</span>
+                </button>
             </div>
 
-        </main>
+            <div class="seq-card-content">
+                <!-- Section 1: PHONETIC TOKEN SEQUENCE -->
+                <div class="seq-block">
+                    <span class="seq-micro-label">PHONETIC TOKEN SEQUENCE</span>
+                    <div class="seq-token-box" id="hamnosys-tags-box"></div>
+                </div>
+
+                <!-- Section 2: HAMNOSYS FONT GLYPHS -->
+                <div class="seq-block">
+                    <span class="seq-micro-label">HAMNOSYS FONT GLYPHS</span>
+                    <div class="seq-glyphs-box" id="hamnosys-glyphs-box"></div>
+                </div>
+
+                <!-- Section 3: HAMKEYBOARD SYMBOL BREAKDOWN -->
+                <div class="seq-block">
+                    <span class="seq-micro-label">HAMKEYBOARD SYMBOL BREAKDOWN</span>
+                    <div class="breakdown-grid" id="hamnosys-breakdown-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SiGML XML Code Inspector Card (Hidden until video is processed) -->
+        <section class="card sigml-inspector-card hidden" id="sigml-inspector-card">
+            <div class="sigml-card-header">
+                <div class="sigml-title-group">
+                    <h3 class="sigml-main-title">SiGML XML Code Inspector</h3>
+                    <p class="sigml-sub-title">Signing Gesture Markup Language script generated for 3D avatar animation</p>
+                </div>
+                <button id="btn-copy-sigml" class="btn-copy-sigml" title="Copy SiGML XML to Clipboard">
+                    <svg class="copy-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span id="copy-sigml-text">Copy SiGML XML</span>
+                </button>
+            </div>
+
+            <div class="sigml-code-container">
+                <pre class="sigml-code-block" id="sigml-code-display"><code></code></pre>
+            </div>
+        </section>
+
+
+        <!-- Universal Any-to-Any Sign Language Synthesizer (Future Roadmap) -->
+        <section class="card roadmap-card">
+            <div class="roadmap-header">
+                <span class="roadmap-badge">FUTURE ROADMAP</span>
+                <h3 class="roadmap-title">Universal Any-to-Any Sign Language Synthesizer</h3>
+                <p class="roadmap-desc">
+                    Our architectural foundation translates continuous sign language video streams into universal HamNoSys phonetic notation. In future phases, this enables direct cross-lingual conversion between any input sign language (ISL, ASL, BSL, DGS) and any requested target 3D signing avatar dialect.
+                </p>
+            </div>
+
+            <div class="roadmap-grid">
+                <!-- Card 1 -->
+                <div class="roadmap-feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                    <h4 class="feature-title">Any Input Sign Language</h4>
+                    <p class="feature-desc">Recognizing gestures from video clips in regional and national sign languages.</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="roadmap-feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                            <line x1="4" y1="22" x2="4" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h4 class="feature-title">Universal Phonetic Translation</h4>
+                    <p class="feature-desc">Compiling features into standardized HamNoSys notation for intermediate translation.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="roadmap-feature-card">
+                    <div class="feature-icon-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                        </svg>
+                    </div>
+                    <h4 class="feature-title">Target 3D Signing Avatar</h4>
+                    <p class="feature-desc">Rendering natural 3D avatar animations in whichever target sign language dialect the user selects.</p>
+                </div>
+            </div>
+        </section>
+
     </div>
 
-    <!-- Hidden textarea to store SiGML temporarily if needed -->
     <textarea id="sigml-storage" hidden></textarea>
 
+    <!-- JavaScript Application Logic -->
     <script src="/static/js/app.js"></script>
 </body>
 </html>

@@ -464,13 +464,14 @@ def calculate_orientation_from_landmarks(h_landmarks):
 
 
 def run_orientation_module(video_path):
-    views, fingers, palms = [], [], []
+    views_r, fingers_r, palms_r = [], [], []
+    views_l, fingers_l, palms_l = [], [], []
 
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         return {"per_frame": [], "final": None}
 
-    with mp_hands.Hands(static_image_mode=False, max_num_hands=1, min_detection_confidence=0.5) as hands:
+    with mp_hands.Hands(static_image_mode=False, max_num_hands=2, min_detection_confidence=0.4) as hands:
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -479,29 +480,43 @@ def run_orientation_module(video_path):
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             res = hands.process(rgb)
 
-            if not res.multi_hand_landmarks:
+            if not res.multi_hand_landmarks or not res.multi_handedness:
                 continue
 
-            h_landmarks = res.multi_hand_landmarks[0].landmark
-            view, finger, palm = calculate_orientation_from_landmarks(h_landmarks)
+            for h_landmarks_obj, handedness in zip(res.multi_hand_landmarks, res.multi_handedness):
+                h_type = handedness.classification[0].label # 'Right' or 'Left'
+                h_landmarks = h_landmarks_obj.landmark
+                view, finger, palm = calculate_orientation_from_landmarks(h_landmarks)
 
-            views.append(view)
-            fingers.append(finger)
-            palms.append(palm)
+                if h_type == "Right":
+                    views_r.append(view)
+                    fingers_r.append(finger)
+                    palms_r.append(palm)
+                else:
+                    views_l.append(view)
+                    fingers_l.append(finger)
+                    palms_l.append(palm)
 
     cap.release()
 
-    if not views:
-        return {"per_frame": [], "final": None}
+    if not views_r and not views_l:
+        return {"per_frame": [], "final": ("signer", "hamextfingeru", "hampalmd"), "final_right": ("signer", "hamextfingeru", "hampalmd"), "final_left": None}
 
-    final_view   = Counter(views).most_common(1)[0][0]
-    final_finger = Counter(fingers).most_common(1)[0][0]
-    final_palm   = Counter(palms).most_common(1)[0][0]
+    final_view_r = Counter(views_r).most_common(1)[0][0] if views_r else "signer"
+    final_finger_r = Counter(fingers_r).most_common(1)[0][0] if fingers_r else "hamextfingeru"
+    final_palm_r = Counter(palms_r).most_common(1)[0][0] if palms_r else "hampalmd"
+
+    final_view_l = Counter(views_l).most_common(1)[0][0] if views_l else "signer"
+    final_finger_l = Counter(fingers_l).most_common(1)[0][0] if fingers_l else "hamextfingero"
+    final_palm_l = Counter(palms_l).most_common(1)[0][0] if palms_l else "hampalmu"
 
     return {
-        "per_frame": list(zip(views, fingers, palms)),
-        "final": (final_view, final_finger, final_palm)
+        "per_frame": list(zip(views_r, fingers_r, palms_r)) if views_r else list(zip(views_l, fingers_l, palms_l)),
+        "final": (final_view_r, final_finger_r, final_palm_r),
+        "final_right": (final_view_r, final_finger_r, final_palm_r),
+        "final_left": (final_view_l, final_finger_l, final_palm_l) if views_l else None
     }
+
 
 
 # In[ ]:

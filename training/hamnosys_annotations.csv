@@ -1,0 +1,5 @@
+video_path,sign_id,gloss,hamnosys
+# Add one row per *human-verified* recording.  `sign_id` identifies one BSL
+# lexical sign (not an English word); each sign_id needs at least two recordings
+# from different signers for a valid hold-out evaluation.
+# videos/hello/signer_01.mp4,hello-1,hello,hamflathand hamthumbopenmod hamextfingeru hampalmd hamheadtop hamtouch hammoveu

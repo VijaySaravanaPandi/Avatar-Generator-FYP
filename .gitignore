@@ -16,6 +16,8 @@ venv/
 env/
 .venv/
 .env/
+.venv*/
+.venv-bsl/
 
 # ===========================
 # Jupyter Notebooks
@@ -55,9 +57,11 @@ desktop.ini
 *.pem
 
 # ===========================
-# Archives (already extracted, no need in repo)
+# Archives & Datasets
 # ===========================
 *.zip
+bsldict/
+*.log
 
 # ===========================
 # Large video files & temp outputs

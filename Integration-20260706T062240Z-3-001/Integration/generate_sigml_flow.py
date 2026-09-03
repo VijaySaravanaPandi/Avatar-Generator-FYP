@@ -1,14 +1,15 @@
+ # Contribution by Vijay: HamNoSys to SiGML XML Conversion Pipeline.
 import os
 import sys
 import subprocess
 
-# Set up paths
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 if _SCRIPT_DIR not in sys.path:
     sys.path.insert(0, _SCRIPT_DIR)
 
-SPREADSHEET_PATH = r"d:\academics\HamNoSys_Group14\Senior Code\HamNoSys2SiGML-master\HamNoSys2SiGML-master\Original\conversionSpreadSheet.txt"
-HAM2SIGML_SCRIPT = r"d:\academics\HamNoSys_Group14\Senior Code\HamNoSys2SiGML-master\HamNoSys2SiGML-master\Original\HamNoSys2SiGML.py"
+PROJECT_ROOT = os.path.abspath(os.path.join(_SCRIPT_DIR, "..", ".."))
+SPREADSHEET_PATH = os.path.join(PROJECT_ROOT, "Senior Code", "HamNoSys2SiGML-master", "HamNoSys2SiGML-master", "Original", "conversionSpreadSheet.txt")
+HAM2SIGML_SCRIPT = os.path.join(PROJECT_ROOT, "Senior Code", "HamNoSys2SiGML-master", "HamNoSys2SiGML-master", "Original", "HamNoSys2SiGML.py")
 
 from integration_pipeline import process_video
 
