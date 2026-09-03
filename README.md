@@ -61,10 +61,10 @@ git lfs install
 git lfs install
 
 # Step 2: Clone (LFS files download automatically)
-git clone https://github.com/SaiSriSatvic2005/Avatar-Generator-FYP-.git
+git clone https://github.com/VijaySaravanaPandi/Avatar-Generator-FYP.git
 
 # Step 3: Navigate into the project
-cd Avatar-Generator-FYP-
+cd Avatar-Generator-FYP
 
 # Step 4: Verify LFS files were downloaded
 git lfs ls-files
@@ -115,14 +115,31 @@ pip install -r requirements.txt
 
 ## ▶️ Usage
 
+### Web App — Flask UI & 3D Avatar Player (Recommended)
+
+From the project root:
+```bash
+py -3.12 webapp\app.py
+```
+*Or navigate into `webapp` first:*
+```bash
+cd webapp
+py -3.12 app.py
+```
+*(On macOS / Linux: `python3 webapp/app.py`)*
+
+Then open **http://localhost:5000** in your browser to access the full UI dashboard and 3D avatar.
+
+---
+
 ### CLI — Run on a single video
 
+From `Integration-20260706T062240Z-3-001/Integration`:
 ```bash
 cd Integration-20260706T062240Z-3-001/Integration
 
 # Default video (Prompt_1.mp4)
 py -3.12 run_local.py
-# or: python run_local.py
 
 # Custom video
 py -3.12 run_local.py path/to/your_video.mp4
@@ -130,14 +147,6 @@ py -3.12 run_local.py path/to/your_video.mp4
 # Custom output path
 py -3.12 run_local.py input.mp4 -o output.mp4
 ```
-
-### Web App — Flask UI & 3D Avatar Player
-
-```bash
-cd webapp
-py -3.12 app.py
-```
-*(On macOS / Linux: `python3 app.py`)*
 
 Then open **http://localhost:5000** in your browser to access:
 - **Video Upload & Analysis**: Upload sign language video recordings (.mp4, .avi, .mov)
